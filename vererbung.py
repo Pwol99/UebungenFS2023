@@ -59,6 +59,8 @@ C = Punkt(3,4)
 
 D= Dreieck(A,B,C)
 print(D)
+print(D.Umfang())
+
 
 M = Punkt(2,3)
 k1 = Kreis(M, 10)

@@ -1,79 +1,130 @@
-import math
-class Point:
+from math import *
+class Figur:
+    def __init__(self, name):
+        self.name = name
+        
+    def umfang(self):
+        return 0
+    
+    def flaeche(self):
+        return 0
+    
+    def __str__(self):
+        return f"{self.name}"
+
+    
+class Punkt(Figur):
     def __init__(self, x, y):
+        super().__init__("Punkt")
         self.x = x
         self.y = y
 
-    def __str__(self):
-        return "({0},{1})".format(self.x, self.y)
+    def __sub__(self, other):
+        return Vector2(self.x - other.x, self.y - other.y)
 
-class Figur:
-    def __init__(self):
-        self.name = "Figur"
-
-    def Umfang(self):
-        return 0
+    def dist(self, other):
+        return ((self.x - other.x) ** 2 + (self.y - other.y) ** 2) ** 0.5
 
     def __str__(self):
-        return self.name
+        return f"[{self.name}, x={self.x}, y={self.y}]"
 
+    
+class Vector2(Figur):
+    def __init__(self, x, y):
+        super().__init__("Vector2")
+        self.x = x
+        self.y = y
+    
+    def cross(self, other):
+        return abs(self.x * other.y - self.y * other.x)
+    
+    
 class Dreieck(Figur):
-    def __init__(self, a, b, c):
-        super().__init__()
-        self.name = "Dreieck"
-        self.a = a
-        self.b = b
-        self.c = c
+    def __init__(self, Ax, Ay, Bx, By, Cx, Cy):
+        super().__init__("Dreieck")
+        self.A = Punkt(Ax, Ay)
+        self.B = Punkt(Bx, By)
+        self.C = Punkt(Cx, Cy)
 
-    def Umfang(self):
-        return math.dist((self.a.x, self.a.y), (self.b.x, self.b.y)) + \
-               math.dist((self.b.x, self.b.y), (self.c.x, self.c.y)) + \
-               math.dist((self.c.x, self.c.y), (self.a.x, self.a.y))
-
+    def flaeche(self):
+        v1 = (self.B - self.A)
+        v2 = (self.C - self.A)
+        return v1.cross(v2) / 2
+        
     def __str__(self):
-        return "Dreieck A={0} B={1} C={2}".format(self.a, self.b, self.c)
+        return f"[{self.A}, {self.B}, {self.C}]"
+
+    def umfang(self):
+        return self.A.dist(self.B) + self.B.dist(self.C) + self.C.dist(self.A)
 
 class Rechteck(Figur):
-    def __init__(self, a, b):
-        super().__init__()
-        self.name = "Rechteck"
-        self.a = a
-        self.b = b
+    def __init__(self,ax,ay,bx,by):
+        super().__init__("Rechteck")
+        self.A = Punkt(ax,ay)
+        self.C = Punkt(bx,by)
+        self.D = Punkt(ax,by)
+        self.B = Punkt(bx,ay)
 
-    def Umfang(self):
-        return 2 * (abs(self.a.x - self.b.x) + abs(self.a.y - self.b.y))
 
-    def __str__(self):
-        return "Rechteck A={0} B={1}".format(self.a, self.b)
 
-class Kreis(Figur):
-    def __init__(self, m, r):
-        super().__init__()
-        self.name = "Kreis"
-        self.m = m
-        self.r = r
+    def umfang(self):
+        return self.A.dist(self.B)+self.B.dist(self.C)+self.C.dist(self.D)+self.D.dist(self.A)
 
-    def Umfang(self):
-        return 2 * math.pi * self.r
+    def flaeche(self):
+        v1 = (self.B - self.A)
+        v2 = (self.D - self.A)
+        v3 = (self.B - self.C)
+        v4 = (self.D - self.C)
+        return v1.cross(v2) / 2 + v3.cross(v4)/2
 
-    def __str__(self):
-        return "Kreis M={0} r={1}".format(self.m, self.r)
+class Kreis (Figur):
+    def __init__ (self,mx,my,r):
+        super().__init__("Kreis")
+        self.m=Punkt(mx,my)
+        self.r=r
+        
+    def flaeche(self):
+        return self.r**2*pi
+    
+    def umfang(self):
+        return self.r*2*pi
 
 class Polygon(Figur):
-    def __init__(self, *points):
-        super().__init__()
-        self.name = "Polygon"
-        self.points = points
+    def __init__(self,*args):
+        super().__init__("Polygon")
+        self.punkte=[]
+        for i in range(0,len(args),2):
+            x,y=args[i],args[i+1]
+            self.punkte.append(Punkt(x,y))
 
-    def Umfang(self):
+    def umfang(self):
         umfang = 0
-        for i in range(len(self.points) - 1):
-            umfang += math.dist((self.points[i].x, self.points[i].y), (self.points[i+1].x, self.points[i+1].y))
-        umfang += math.dist((self.points[-1].x, self.points[-1].y), (self.points[0].x, self.points[0].y))
+        for i in range(len(self.punkte)):
+            x = (i+1)%len(self.punkte)
+            seite=self.punkte[i].dist(self.punkte[x])
+            umfang += seite
         return umfang
+        
+    def flaeche(self):
+        flaeche= 0
+        for i in range(len(self.punkte)):
+            x=(i+1)%len(self.punkte)
+            flaeche+=self.punkte[i].x*self.punkte[x].y
+            flaeche-=self.punkte[i].y*self.punkte[x].x
+        return abs(flaeche/2)
+            
+        
 
-    def __str__(self):
-        points_str = ""
-        for point in self.points:
-            points_str += str(point) + " "
-        return "Polygon Points=({0})".format(points_str)
+p = Punkt(1, 2)
+d = Dreieck(0, 0, 0, 2, 2, 2)
+r=Rechteck(0,0,2,2)
+k=Kreis(0,0,10)
+test=Polygon(0,0,0,2,2,2,2,0,2,-2,0,-2)
+print(d.umfang())
+print(d.flaeche())
+print(r.umfang())
+print(r.flaeche())
+print(k.flaeche())
+print(k.umfang())
+print(test.umfang())
+print(test.flaeche())
