@@ -6,7 +6,7 @@ class MyWindow(QMainWindow):
         super().__init__()
 
         # Fenster-Titel definieren:
-        self.setWindowTitle("layout")
+        self.setWindowTitle("GUI-Programmierung")
 
     # layout erzeugen
         layout = QFormLayout()
@@ -15,6 +15,7 @@ class MyWindow(QMainWindow):
         self.vorname = QLineEdit()
         self.name = QLineEdit()
         self.geburtstag = QCalendarWidget()
+    # ja es wäre ein QLineEdit, aber ich finde es mit dem QCAlenderWidget schöner und angenehmer. 
         self.adresse = QLineEdit()
         self.plz = QLineEdit()
         self.ort = QLineEdit()
@@ -49,8 +50,14 @@ class MyWindow(QMainWindow):
         self.save_action.triggered.connect(self.save_data)
         self.quit_action.triggered.connect(self.quit_app)
         self.save_button.clicked.connect(self.save_data)
+        self.name.textChanged.connect(self.check_name)
 
         self.show()
+    #Wenn man im Unterricht noch zuviel Zeit hat für solche Spielereien...
+    def check_name(self, text):
+        if text.lower() == "ostern":
+            QMessageBox.information(self, "Happy Easter", "Herzlichen Glückwunsch! Sie haben das Easter Egg gefunden!")
+            self.setWindowTitle("GUI-Programmierung - Easter Egg gefunden!")
 
     def save_data(self):
     # Daten aus den GUI-Elementen lesen
@@ -75,8 +82,7 @@ class MyWindow(QMainWindow):
         with open(file_name, "w") as f:
             f.write(data)
 
-
-
+        self.check_name(Name)
 
     def quit_app(self):
     # Programm beenden
