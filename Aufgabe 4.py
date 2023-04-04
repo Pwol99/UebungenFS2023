@@ -53,7 +53,7 @@ class MyWindow(QMainWindow):
         self.name.textChanged.connect(self.check_name)
 
         self.show()
-    #Wenn man im Unterricht noch zuviel Zeit hat für solche Spielereien...
+    #Spass an Spielereien....
     def check_name(self, text):
         if text.lower() == "ostern":
             QMessageBox.information(self, "Happy Easter", "Herzlichen Glückwunsch! Sie haben das Easter Egg gefunden!")
