@@ -10,13 +10,10 @@ class MainWindow(QMainWindow):
         main_widget = QWidget(self)
         self.setCentralWidget(main_widget)
 
-        self.degree_lbl = QLabel("Grad:", main_widget)
-        self.degree_le = QLineEdit(main_widget)
-
         self.coeff_lbl = QLabel("Koeffizienten (durch Komma getrennt):", main_widget)
         self.coeff_le = QLineEdit(main_widget)
 
-        self.range_lbl = QLabel("X-Bereich (durch Komma getrennt z.B. -5,5 )", main_widget)
+        self.range_lbl = QLabel("X-Bereich (durch Strich getrennt z.B. -5 5 )", main_widget)
         self.range_le = QLineEdit(main_widget)
 
         self.points_lbl = QLabel("Anzahl der Punkte:", main_widget)
@@ -30,8 +27,6 @@ class MainWindow(QMainWindow):
         self.plot_btn.clicked.connect(self.plot)
 
         main_layout = QVBoxLayout(main_widget)
-        main_layout.addWidget(self.degree_lbl)
-        main_layout.addWidget(self.degree_le)
         main_layout.addWidget(self.coeff_lbl)
         main_layout.addWidget(self.coeff_le)
         main_layout.addWidget(self.range_lbl)
@@ -47,28 +42,28 @@ class MainWindow(QMainWindow):
 
     def plot(self):
         try:
-            degree = int(self.degree_le.text())
-        except:
-            QMessageBox.critical(self, "Fehler", "Bitte eingabe  des Funktionsgrades Überprüfen")
-            return
-        
-        try:
             coeffs = [float(c.strip()) for c in self.coeff_le.text().split(",")]
             f = np.poly1d(coeffs)
         except:
-            QMessageBox.critical(self, "Fehler", "Bitte eingabe  der Koeffizienten Überprüfen!")
+            QMessageBox.critical(self, "Fehler", "Bitte Eingabe der Koeffizienten Überprüfen!")
             return
+
         try:
-            x_range = [float(x.strip()) for x in self.range_le.text().split(",")]
+            x_range = [float(x.strip()) for x in self.range_le.text().split(" ")]
+            if len(x_range) != 2:
+                raise ValueError
         except:
-            QMessageBox.critical(self, "Fehler", "Bitte eingabe  des Wertebereiches Überprüfen!")
+            QMessageBox.critical(self, "Fehler", "Bitte Eingabe des Wertebereichs Überprüfen!")
             return
-        try:        
+
+        try:
             num_points = int(self.points_le.text())
+            if num_points <= 0:
+                raise ValueError
         except:
-            QMessageBox.critical(self, "Fehler", "Bitte eingabe  der Anzahl darzustellenden Punkte überprüfen!")
+            QMessageBox.critical(self, "Fehler", "Bitte Eingabe der Anzahl darzustellenden Punkte Überprüfen!")
             return
-        
+
         color = self.color_cb.currentText()
 
         if color == "blau":
@@ -80,10 +75,9 @@ class MainWindow(QMainWindow):
         elif color == "schwarz":
             color = "k"
 
-
         x = np.linspace(x_range[0], x_range[1], num_points)
         y = f(x)
-
+        plt.close()
         plt.clf()
         plt.plot(x, y, color=color)
 
@@ -91,6 +85,7 @@ class MainWindow(QMainWindow):
         plt.xlabel("x")
         plt.ylabel("y")
         plt.show()
+
 
 
 if __name__ == "__main__":
